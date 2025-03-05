@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mariadb:
+    build:
+      context: ./database
+    container_name: mariadb-container
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+    volumes:
+      - ./database/ressource/pokemon.sql:/docker-entrypoint-initdb.d/pokemon.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+  
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend-container
+    volumes:
+      - ./frontend/ressource:/var/www/html/pokemon
+    ports:
+      - "8080:8080"
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - mariadb
+
+networks:
+  app-network:
+    driver: bridge
